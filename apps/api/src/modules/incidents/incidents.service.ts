@@ -74,7 +74,7 @@ export class IncidentsService {
     if (status === 'resolved' || status === 'closed') {
       incident.resolvedBy = userId;
       incident.resolvedAt = new Date();
-      incident.resolutionNotes = notes;
+      incident.resolutionNotes = notes ?? '';
     }
     return this.incidentRepo.save(incident);
   }

@@ -62,6 +62,9 @@ export class Watchlist {
   @Column({ name: 'is_active', default: true })
   isActive: boolean;
 
+  @Column({ name: 'created_by', nullable: true })
+  createdBy: string;
+
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
 

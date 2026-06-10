@@ -61,6 +61,9 @@ export class User {
   @Column({ name: 'locked_until', nullable: true })
   lockedUntil: Date;
 
+  @Column({ name: 'password_changed_at', nullable: true })
+  passwordChangedAt: Date;
+
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
 

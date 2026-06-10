@@ -914,6 +914,6 @@ INSERT INTO permissions (id, name, slug, module) VALUES
 -- Super admin user (password: Admin@123 - bcrypt hash)
 INSERT INTO users (id, tenant_id, role_id, email, password_hash, first_name, last_name, is_active, is_verified) VALUES
 ('00000000-0000-0000-0000-000000000401', '00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000301',
- 'admin@hms.gov.in', '$2b$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/X4.G2oYgVqF5K5K5K', 'System', 'Administrator', 1, 1);
+ 'admin@hms.gov.in', '$2b$12$cJv/LBxW1ZboMtoGgIyDXOi8eNRgPAtNRQSEDTzAZl0z.cZ78UJFO', 'System', 'Administrator', 1, 1);
 
 SET FOREIGN_KEY_CHECKS = 1;
