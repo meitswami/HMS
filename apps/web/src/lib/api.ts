@@ -90,12 +90,23 @@ class ApiClient {
 
   // AI Search
   aiSearch(query: string) {
-    return this.request('/ai/search', { method: 'POST', body: JSON.stringify({ query }) });
+    return this.request<{
+      query: string;
+      interpretation: string;
+      count: number;
+      results: Array<Record<string, unknown>>;
+    }>('/ai/search', { method: 'POST', body: JSON.stringify({ query }) });
   }
 
   // Analytics
   getAnalytics(period: string) {
-    return this.request(`/analytics/report?period=${period}`);
+    return this.request<{
+      period: string;
+      total: number;
+      byGender: Array<{ gender: string; count: string }>;
+      byNationality: Array<{ nationality: string; count: string }>;
+      dailyTrend: Array<{ date: string; count: string }>;
+    }>(`/analytics/report?period=${period}`);
   }
 
   // Incidents
