@@ -1,0 +1,26 @@
+{
+  "name": "hms-e-register",
+  "version": "1.0.0",
+  "description": "AI Hotel Register & Police Intelligence Command Centre",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "concurrently \"npm run dev:api\" \"npm run dev:web\"",
+    "dev:api": "npm run start:dev --workspace=@hms/api",
+    "dev:web": "npm run dev --workspace=@hms/web",
+    "build": "npm run build --workspaces --if-present",
+    "build:api": "npm run build --workspace=@hms/api",
+    "build:web": "npm run build --workspace=@hms/web",
+    "lint": "npm run lint --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.0"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}
