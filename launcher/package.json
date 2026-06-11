@@ -1,0 +1,10 @@
+{
+  "name": "hms-launcher",
+  "version": "1.0.0",
+  "private": true,
+  "bin": "launcher.js",
+  "pkg": {
+    "targets": ["node18-win-x64"],
+    "outputPath": "../dist/portable"
+  }
+}

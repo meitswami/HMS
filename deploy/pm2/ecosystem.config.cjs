@@ -36,8 +36,8 @@ module.exports = {
     {
       name: 'hms-ocr',
       cwd: path.join(root, 'services/ocr-service'),
-      script: '.venv/bin/uvicorn',
-      args: 'main:app --host 0.0.0.0 --port 5000 --workers 1',
+      script: '.venv/bin/python',
+      args: '-m uvicorn main:app --host 0.0.0.0 --port 5000 --workers 1',
       instances: 1,
       exec_mode: 'fork',
       max_memory_restart: '1G',

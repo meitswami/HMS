@@ -24,6 +24,7 @@
     "infra:docker:down": "docker compose -f docker-compose.infra.yml down",
     "docker:up": "docker compose up -d --build",
     "docker:down": "docker compose down",
+    "build:portable": "powershell -ExecutionPolicy Bypass -File scripts/build-portable.ps1",
     "lint": "npm run lint --workspaces --if-present",
     "test": "npm run test --workspaces --if-present"
   },
