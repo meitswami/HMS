@@ -11,24 +11,40 @@ export class StorageService implements OnModuleInit {
 
   constructor(private config: ConfigService) {
     this.bucket = config.get('S3_BUCKET', 'hms-documents');
-    this.client = new Minio.Client({
-      endPoint: config.get('S3_ENDPOINT', 'localhost'),
-      port: config.get<number>('S3_PORT', 9000),
-      useSSL: config.get('S3_USE_SSL', 'false') === 'true',
-      accessKey: config.get('S3_ACCESS_KEY', 'minioadmin'),
-      secretKey: config.get('S3_SECRET_KEY', 'minioadmin'),
-    });
+    const provider = config.get('S3_PROVIDER', 'minio');
+
+    if (provider === 'aws') {
+      const region = config.get('S3_REGION', 'ap-south-1');
+      this.client = new Minio.Client({
+        endPoint: `s3.${region}.amazonaws.com`,
+        port: 443,
+        useSSL: true,
+        accessKey: config.get('S3_ACCESS_KEY')!,
+        secretKey: config.get('S3_SECRET_KEY')!,
+        region,
+      });
+    } else {
+      this.client = new Minio.Client({
+        endPoint: config.get('S3_ENDPOINT', 'localhost'),
+        port: config.get<number>('S3_PORT', 9000),
+        useSSL: config.get('S3_USE_SSL', 'false') === 'true',
+        accessKey: config.get('S3_ACCESS_KEY', 'minioadmin'),
+        secretKey: config.get('S3_SECRET_KEY', 'minioadmin'),
+        region: config.get('S3_REGION', 'us-east-1'),
+      });
+    }
   }
 
   async onModuleInit() {
+    const provider = this.config.get('S3_PROVIDER', 'minio');
     try {
       const exists = await this.client.bucketExists(this.bucket);
-      if (!exists) {
-        await this.client.makeBucket(this.bucket);
+      if (!exists && provider !== 'aws') {
+        await this.client.makeBucket(this.bucket, this.config.get('S3_REGION', 'us-east-1'));
         this.logger.log(`Created bucket: ${this.bucket}`);
       }
     } catch (err) {
-      this.logger.warn(`MinIO not available: ${(err as Error).message}`);
+      this.logger.warn(`Object storage not available: ${(err as Error).message}`);
     }
   }
 

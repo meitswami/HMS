@@ -44,22 +44,22 @@ HMS/
 └── docker-compose.yml
 ```
 
-## Quick Start
+## Deployment Modes
 
-```bash
-# 1. Configure environment
-cp .env.example .env
+| Mode | Command | Docker required? |
+|------|---------|------------------|
+| **Windows 11 local** | `.\scripts\start-windows.ps1` | No (optional for file storage) |
+| **AWS EC2 native** | `npm run start:ec2` | No — uses AWS S3 + PM2 |
+| **AWS EC2 Docker** | `npm run docker:up` | Yes |
 
-# 2. Initialize database
-mysql -h <host> -u <user> -p <database> < database/schema.sql
+See [Deployment Guide](docs/DEPLOYMENT.md) for full instructions.
 
-# 3. Install dependencies
+## Quick Start (Windows, no Docker)
+
+```powershell
+copy deploy\env\windows.env.example .env
+node database\migrate.js
 npm install
-
-# 4. Start infrastructure
-docker compose up -d minio redis
-
-# 5. Run development
 npm run dev
 ```
 

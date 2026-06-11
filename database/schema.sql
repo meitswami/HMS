@@ -461,7 +461,7 @@ CREATE TABLE IF NOT EXISTS ocr_pages (
 CREATE TABLE IF NOT EXISTS ocr_rows (
     id              CHAR(36)     NOT NULL DEFAULT (UUID()),
     page_id         CHAR(36)     NOT NULL,
-    row_number      INT          NOT NULL,
+    row_num         INT          NOT NULL,
     guest_id        CHAR(36)     NULL COMMENT 'Linked after approval',
     status          ENUM('extracted','edited','approved','rejected','imported') NOT NULL DEFAULT 'extracted',
     created_at      TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -872,18 +872,18 @@ DELIMITER ;
 -- SEED DATA
 -- -----------------------------------------------------------------------------
 
-INSERT INTO tenants (id, name, slug) VALUES
+INSERT IGNORE INTO tenants (id, name, slug) VALUES
 ('00000000-0000-0000-0000-000000000001', 'Default Tenant', 'default');
 
-INSERT INTO countries (id, name, iso_code_2, iso_code_3, phone_code) VALUES
+INSERT IGNORE INTO countries (id, name, iso_code_2, iso_code_3, phone_code) VALUES
 ('00000000-0000-0000-0000-000000000101', 'India', 'IN', 'IND', '+91');
 
-INSERT INTO states (id, country_id, name, code) VALUES
+INSERT IGNORE INTO states (id, country_id, name, code) VALUES
 ('00000000-0000-0000-0000-000000000201', '00000000-0000-0000-0000-000000000101', 'Rajasthan', 'RJ'),
 ('00000000-0000-0000-0000-000000000202', '00000000-0000-0000-0000-000000000101', 'Delhi', 'DL'),
 ('00000000-0000-0000-0000-000000000203', '00000000-0000-0000-0000-000000000101', 'Maharashtra', 'MH');
 
-INSERT INTO roles (id, tenant_id, name, slug, level, is_system) VALUES
+INSERT IGNORE INTO roles (id, tenant_id, name, slug, level, is_system) VALUES
 ('00000000-0000-0000-0000-000000000301', NULL, 'Super Admin', 'super_admin', 100, 1),
 ('00000000-0000-0000-0000-000000000302', NULL, 'Police Command', 'police_command', 90, 1),
 ('00000000-0000-0000-0000-000000000303', NULL, 'Police Officer', 'police_officer', 80, 1),
@@ -891,28 +891,28 @@ INSERT INTO roles (id, tenant_id, name, slug, level, is_system) VALUES
 ('00000000-0000-0000-0000-000000000305', NULL, 'Hotel Manager', 'hotel_manager', 40, 1),
 ('00000000-0000-0000-0000-000000000306', NULL, 'Receptionist', 'receptionist', 30, 1);
 
-INSERT INTO permissions (id, name, slug, module) VALUES
-(UUID(), 'View Dashboard', 'dashboard.view', 'dashboard'),
-(UUID(), 'Manage Hotels', 'hotels.manage', 'hotels'),
-(UUID(), 'View Hotels', 'hotels.view', 'hotels'),
-(UUID(), 'Register Guest', 'guests.create', 'guests'),
-(UUID(), 'View Guests', 'guests.view', 'guests'),
-(UUID(), 'Edit Guests', 'guests.edit', 'guests'),
-(UUID(), 'OCR Upload', 'ocr.upload', 'ocr'),
-(UUID(), 'OCR Approve', 'ocr.approve', 'ocr'),
-(UUID(), 'View Watchlist', 'watchlist.view', 'watchlist'),
-(UUID(), 'Manage Watchlist', 'watchlist.manage', 'watchlist'),
-(UUID(), 'View Incidents', 'incidents.view', 'incidents'),
-(UUID(), 'Manage Incidents', 'incidents.manage', 'incidents'),
-(UUID(), 'View Analytics', 'analytics.view', 'analytics'),
-(UUID(), 'Export Reports', 'reports.export', 'reports'),
-(UUID(), 'Manage Users', 'users.manage', 'users'),
-(UUID(), 'View Audit Logs', 'audit.view', 'audit'),
-(UUID(), 'AI Search', 'ai.search', 'ai'),
-(UUID(), 'Command Centre', 'command.view', 'command');
+INSERT IGNORE INTO permissions (id, name, slug, module) VALUES
+('00000000-0000-0000-0000-000000000501', 'View Dashboard', 'dashboard.view', 'dashboard'),
+('00000000-0000-0000-0000-000000000502', 'Manage Hotels', 'hotels.manage', 'hotels'),
+('00000000-0000-0000-0000-000000000503', 'View Hotels', 'hotels.view', 'hotels'),
+('00000000-0000-0000-0000-000000000504', 'Register Guest', 'guests.create', 'guests'),
+('00000000-0000-0000-0000-000000000505', 'View Guests', 'guests.view', 'guests'),
+('00000000-0000-0000-0000-000000000506', 'Edit Guests', 'guests.edit', 'guests'),
+('00000000-0000-0000-0000-000000000507', 'OCR Upload', 'ocr.upload', 'ocr'),
+('00000000-0000-0000-0000-000000000508', 'OCR Approve', 'ocr.approve', 'ocr'),
+('00000000-0000-0000-0000-000000000509', 'View Watchlist', 'watchlist.view', 'watchlist'),
+('00000000-0000-0000-0000-000000000510', 'Manage Watchlist', 'watchlist.manage', 'watchlist'),
+('00000000-0000-0000-0000-000000000511', 'View Incidents', 'incidents.view', 'incidents'),
+('00000000-0000-0000-0000-000000000512', 'Manage Incidents', 'incidents.manage', 'incidents'),
+('00000000-0000-0000-0000-000000000513', 'View Analytics', 'analytics.view', 'analytics'),
+('00000000-0000-0000-0000-000000000514', 'Export Reports', 'reports.export', 'reports'),
+('00000000-0000-0000-0000-000000000515', 'Manage Users', 'users.manage', 'users'),
+('00000000-0000-0000-0000-000000000516', 'View Audit Logs', 'audit.view', 'audit'),
+('00000000-0000-0000-0000-000000000517', 'AI Search', 'ai.search', 'ai'),
+('00000000-0000-0000-0000-000000000518', 'Command Centre', 'command.view', 'command');
 
 -- Super admin user (password: Admin@123 - bcrypt hash)
-INSERT INTO users (id, tenant_id, role_id, email, password_hash, first_name, last_name, is_active, is_verified) VALUES
+INSERT IGNORE INTO users (id, tenant_id, role_id, email, password_hash, first_name, last_name, is_active, is_verified) VALUES
 ('00000000-0000-0000-0000-000000000401', '00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000301',
  'admin@hms.gov.in', '$2b$12$cJv/LBxW1ZboMtoGgIyDXOi8eNRgPAtNRQSEDTzAZl0z.cZ78UJFO', 'System', 'Administrator', 1, 1);
 

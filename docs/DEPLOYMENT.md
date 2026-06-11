@@ -1,129 +1,225 @@
 # HMS e-Register — Deployment Guide
 
-## Prerequisites
+This project supports **three deployment modes**. Docker is **optional**.
 
+| Mode | Environment | Docker | Best for |
+|------|-------------|--------|----------|
+| **A** | Windows 11 offline | Optional | Local development |
+| **B** | AWS EC2 Linux online | No | **Limited RAM** (t2.small / t3.small) |
+| **C** | AWS EC2 Linux online | Yes | Full isolated stack |
+
+## Feature availability by mode
+
+| Feature | Windows (no Docker) | EC2 native | EC2 Docker |
+|---------|---------------------|------------|------------|
+| Login, RBAC, MFA | Yes | Yes | Yes |
+| Guest register | Yes | Yes | Yes |
+| Dashboard, alerts | Yes | Yes | Yes |
+| Watchlist matching | Yes | Yes | Yes |
+| File uploads / OCR storage | Needs MinIO or S3 | AWS S3 or MinIO | MinIO container |
+| OCR service | Run locally (Python) | PM2 / systemd | Container |
+| Redis | Optional (not used yet) | Optional | Container |
+
+---
+
+## Mode A — Windows 11 (Offline / Local)
+
+### Prerequisites
 - Node.js 20+
-- Python 3.11+
-- Docker & Docker Compose
-- MySQL 8.0 (remote or local)
-- MinIO or AWS S3
+- Python 3.11+ (for OCR)
+- MySQL access (remote Hostinger or local)
+- Docker Desktop — **optional** (only for MinIO/Redis)
 
-## Quick Start (Development)
+### Quick start (no Docker)
 
-### 1. Clone and Configure
+```powershell
+cd C:\Users\PC-2\Documents\GitHub\HMS
+copy deploy\env\windows.env.example .env
+# Edit .env with DB password
 
-```bash
-git clone <repo-url>
-cd HMS
-cp .env.example .env
-# Edit .env with your MySQL credentials and secrets
-```
-
-### 2. Initialize Database
-
-```bash
-mysql -h auth-db1274.hstgr.io -u u334425891_hms -p u334425891_hms < database/schema.sql
-```
-
-### 3. Start Infrastructure
-
-```bash
-docker compose up -d minio redis
-```
-
-### 4. Install Dependencies
-
-```bash
+node database\migrate.js
 npm install
-cd services/ocr-service && pip install -r requirements.txt
+npm run dev
 ```
 
-### 5. Run Services
+Or use the helper script:
 
-```bash
-# Terminal 1: API
-npm run dev:api
-
-# Terminal 2: Frontend
-npm run dev:web
-
-# Terminal 3: OCR Service
-cd services/ocr-service && uvicorn main:app --reload --port 5000
+```powershell
+.\scripts\start-windows.ps1
 ```
 
-### 6. Access
+### With Docker (full local storage)
 
-| Service | URL |
-|---------|-----|
+Requires **Docker Desktop running**:
+
+```powershell
+.\scripts\start-windows.ps1 -WithDocker
+```
+
+This starts MinIO + Redis, then API + Web.
+
+### OCR on Windows (separate terminal)
+
+```powershell
+cd services\ocr-service
+python -m venv .venv
+.\.venv\Scripts\activate
+pip install -r requirements.txt
+uvicorn main:app --reload --port 5000
+```
+
+| URL | Address |
+|-----|---------|
 | Frontend | http://localhost:3000 |
 | API | http://localhost:4000/api/v1 |
 | Swagger | http://localhost:4000/docs |
-| MinIO Console | http://localhost:9001 |
-| OCR Service | http://localhost:5000/health |
 
-### Default Admin Login
+---
 
-- Email: `admin@hms.gov.in`
-- Password: `Admin@123` (change after first login)
+## Mode B — AWS EC2 Linux (Online, **without Docker**) — Recommended for limited resources
 
-## Production Deployment (Docker)
+Runs Node.js + Python directly via **PM2**. Uses **AWS S3** for file storage (no MinIO container).
+
+### Recommended EC2 size
+- **Minimum:** t3.small (2 GB RAM) — API + Web + lightweight OCR
+- **Better:** t3.medium (4 GB RAM) — if using PaddleOCR
+
+### One-time setup
 
 ```bash
+git clone <repo-url> && cd HMS
+cp deploy/env/ec2-native.env.example .env
+nano .env   # set DB, JWT secrets, AWS S3 credentials, domain
+
+chmod +x deploy/ec2-native/install.sh scripts/start-ec2-native.sh
+./deploy/ec2-native/install.sh
+```
+
+### Configure `.env` for AWS S3 (no MinIO)
+
+```env
+S3_PROVIDER=aws
+S3_REGION=ap-south-1
+S3_BUCKET=hms-documents-prod
+S3_ACCESS_KEY=AKIA...
+S3_SECRET_KEY=...
+```
+
+Create the S3 bucket in AWS Console and attach an IAM policy with `s3:PutObject`, `s3:GetObject`, `s3:DeleteObject`.
+
+### Start / restart
+
+```bash
+npm run start:ec2
+# or
+./scripts/start-ec2-native.sh
+pm2 status
+pm2 logs
+```
+
+### Nginx + HTTPS
+
+```bash
+sudo cp deploy/ec2-native/nginx-hms.conf /etc/nginx/sites-available/hms
+sudo ln -s /etc/nginx/sites-available/hms /etc/nginx/sites-enabled/
+sudo nginx -t && sudo systemctl reload nginx
+sudo certbot --nginx -d your-domain.gov.in
+```
+
+### Memory tips (low-resource EC2)
+- Use `tesseract` instead of `paddle` for OCR: `OCR_DEFAULT_ENGINE=tesseract`
+- Run only API + Web if OCR not needed immediately
+- Use RDS/external MySQL — don't run MySQL on same small instance
+- Enable swap: `sudo fallocate -l 2G /swapfile && sudo chmod 600 /swapfile && sudo mkswap /swapfile && sudo swapon /swapfile`
+
+---
+
+## Mode C — AWS EC2 Linux (Online, **with Docker**)
+
+Full stack in containers. Needs **more RAM** (t3.medium+ recommended).
+
+### Prerequisites on EC2
+
+```bash
+sudo apt update && sudo apt install -y docker.io docker-compose-plugin
+sudo usermod -aG docker $USER
+# Log out and back in
+```
+
+### Deploy
+
+```bash
+git clone <repo-url> && cd HMS
+cp deploy/env/ec2-docker.env.example .env
+nano .env
+
+node database/migrate.js
 docker compose up -d --build
 ```
 
-## Environment Variables
+### Infrastructure only (hybrid)
 
-See `.env.example` for all configuration options. Critical production settings:
-
-| Variable | Description |
-|----------|-------------|
-| `JWT_SECRET` | 256-bit random string |
-| `ENCRYPTION_KEY` | 32-byte AES key for PII |
-| `DB_*` | MySQL connection |
-| `S3_*` | Object storage |
-| `OPENAI_API_KEY` | LLM for AI search |
-
-## SSL/TLS
-
-Place reverse proxy (Nginx/Caddy) in front with Let's Encrypt:
-
-```nginx
-server {
-    listen 443 ssl;
-    server_name hms.example.gov.in;
-
-    location / {
-        proxy_pass http://localhost:3000;
-    }
-    location /api/ {
-        proxy_pass http://localhost:4000;
-    }
-    location /ws/ {
-        proxy_pass http://localhost:4000;
-        proxy_http_version 1.1;
-        proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection "upgrade";
-    }
-}
-```
-
-## Database Backups
+Run MinIO + Redis in Docker, apps natively (saves RAM vs full Docker):
 
 ```bash
-mysqldump -h $DB_HOST -u $DB_USERNAME -p $DB_DATABASE > backup_$(date +%Y%m%d).sql
+docker compose -f docker-compose.infra.yml up -d
+npm run build
+npm run start:ec2
 ```
 
-## Health Checks
+---
 
-- API: `GET /api/v1/auth/me` (with token)
-- OCR: `GET /health`
-- MinIO: `GET /minio/health/live`
+## Database migration (all modes)
 
-## Monitoring
+```bash
+# Linux / macOS
+node database/migrate.js
 
-Recommended stack:
-- **Logs**: ELK or Loki
-- **Metrics**: Prometheus + Grafana
-- **APM**: Sentry for error tracking
-- **Uptime**: UptimeRobot or Pingdom
+# Windows PowerShell
+node database\migrate.js
+```
+
+Safe to re-run — seed data uses `INSERT IGNORE`.
+
+---
+
+## NPM scripts reference
+
+| Script | Description |
+|--------|-------------|
+| `npm run dev` | Windows/local dev (API + Web) |
+| `npm run build` | Build API + Web for production |
+| `npm run db:migrate` | Apply database schema |
+| `npm run infra:docker` | Start MinIO + Redis only |
+| `npm run start:ec2` | Production start via PM2 (EC2 native) |
+| `npm run docker:up` | Full Docker stack |
+| `npm run docker:down` | Stop Docker stack |
+
+---
+
+## Environment templates
+
+| File | Use case |
+|------|----------|
+| `deploy/env/windows.env.example` | Windows 11 local |
+| `deploy/env/ec2-native.env.example` | EC2 without Docker |
+| `deploy/env/ec2-docker.env.example` | EC2 with Docker |
+| `.env.example` | General reference |
+
+---
+
+## Default admin login
+
+- Email: `admin@hms.gov.in`
+- Password: `Admin@123` — **change immediately in production**
+
+---
+
+## Health checks
+
+```bash
+curl http://localhost:4000/api/v1/auth/login   # POST with credentials
+curl http://localhost:5000/health               # OCR service
+pm2 status                                    # EC2 native
+docker compose ps                             # Docker mode
+```
