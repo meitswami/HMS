@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { api } from '@/lib/api';
 import { getStoredUser, guestListPath } from '@/lib/auth';
-import { AadharNumberField } from '@/components/ui/aadhar-number-field';
+import { formatAadharInput } from '@/lib/aadhar';
 
 export default function RegisterGuestPage() {
   const router = useRouter();
@@ -84,11 +84,13 @@ export default function RegisterGuestPage() {
         <Card className="mb-6">
           <CardHeader><CardTitle>Identity Documents</CardTitle></CardHeader>
           <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <AadharNumberField
+            <Field
+              label="Aadhar Number"
               value={form.aadhaarNumber}
               onChange={(v) => update('aadhaarNumber', v)}
-              labelClassName="block text-sm text-slate-400 mb-1.5"
-              inputClassName="w-full px-4 py-2.5 rounded-lg bg-slate-800 border border-slate-700 text-white focus:outline-none focus:border-blue-500"
+              format={formatAadharInput}
+              inputMode="numeric"
+              placeholder="1234-5678-9012"
             />
             <Field label="Passport Number" value={form.passportNumber} onChange={(v) => update('passportNumber', v)} />
           </CardContent>
@@ -118,17 +120,44 @@ export default function RegisterGuestPage() {
   );
 }
 
-function Field({ label, value, onChange, type = 'text', required }: {
-  label: string; value: string; onChange: (v: string) => void; type?: string; required?: boolean;
+function Field({ label, value, onChange, type = 'text', required, format, inputMode, placeholder }: {
+  label: string;
+  value: string;
+  onChange: (v: string) => void;
+  type?: string;
+  required?: boolean;
+  format?: (v: string) => string;
+  inputMode?: React.HTMLAttributes<HTMLInputElement>['inputMode'];
+  placeholder?: string;
 }) {
+  const display = format ? format(value) : value;
+
+  const apply = (raw: string) => {
+    onChange(format ? format(raw) : raw);
+  };
+
   return (
     <div>
       <label className="block text-sm text-slate-400 mb-1.5">{label}</label>
       <input
         type={type}
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
+        inputMode={inputMode}
+        autoComplete={format ? 'off' : undefined}
+        value={display}
+        onChange={(e) => apply(e.target.value)}
+        onInput={(e) => apply((e.target as HTMLInputElement).value)}
+        onPaste={(e) => {
+          if (!format) return;
+          e.preventDefault();
+          const input = e.currentTarget;
+          const pasted = e.clipboardData.getData('text');
+          const start = input.selectionStart ?? display.length;
+          const end = input.selectionEnd ?? display.length;
+          apply(display.slice(0, start) + pasted + display.slice(end));
+        }}
+        onBlur={(e) => format && apply(e.target.value)}
         required={required}
+        placeholder={placeholder}
         className="w-full px-4 py-2.5 rounded-lg bg-slate-800 border border-slate-700 text-white focus:outline-none focus:border-blue-500"
       />
     </div>

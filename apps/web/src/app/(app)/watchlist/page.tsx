@@ -5,7 +5,7 @@ import { Plus, Shield, Download, UserPlus } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { api } from '@/lib/api';
-import { AadharNumberField } from '@/components/ui/aadhar-number-field';
+import { formatAadharInput } from '@/lib/aadhar';
 
 const SOURCE_TYPES = ['police', 'absconder', 'wanted', 'missing', 'terror', 'fraud', 'state', 'custom'] as const;
 
@@ -138,7 +138,14 @@ export default function WatchlistPage() {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <Field label="Mobile" value={form.mobileNumber} onChange={(v) => update('mobileNumber', v)} />
                   <Field label="Email" value={form.email} onChange={(v) => update('email', v)} type="email" />
-                  <AadharNumberField value={form.aadhaarNumber} onChange={(v) => update('aadhaarNumber', v)} />
+                  <Field
+                    label="Aadhar Number"
+                    value={form.aadhaarNumber}
+                    onChange={(v) => update('aadhaarNumber', v)}
+                    format={formatAadharInput}
+                    inputMode="numeric"
+                    placeholder="1234-5678-9012"
+                  />
                   <Field label="Passport" value={form.passportNumber} onChange={(v) => update('passportNumber', v)} />
                   <Field label="Driving License" value={form.drivingLicense} onChange={(v) => update('drivingLicense', v)} />
                   <Field label="Voter ID" value={form.voterId} onChange={(v) => update('voterId', v)} />
@@ -253,17 +260,44 @@ export default function WatchlistPage() {
   );
 }
 
-function Field({ label, value, onChange, type = 'text', required }: {
-  label: string; value: string; onChange: (v: string) => void; type?: string; required?: boolean;
+function Field({ label, value, onChange, type = 'text', required, format, inputMode, placeholder }: {
+  label: string;
+  value: string;
+  onChange: (v: string) => void;
+  type?: string;
+  required?: boolean;
+  format?: (v: string) => string;
+  inputMode?: React.HTMLAttributes<HTMLInputElement>['inputMode'];
+  placeholder?: string;
 }) {
+  const display = format ? format(value) : value;
+
+  const apply = (raw: string) => {
+    onChange(format ? format(raw) : raw);
+  };
+
   return (
     <div>
       <label className="block text-sm text-slate-400 mb-1">{label}</label>
       <input
         type={type}
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
+        inputMode={inputMode}
+        autoComplete={format ? 'off' : undefined}
+        value={display}
+        onChange={(e) => apply(e.target.value)}
+        onInput={(e) => apply((e.target as HTMLInputElement).value)}
+        onPaste={(e) => {
+          if (!format) return;
+          e.preventDefault();
+          const input = e.currentTarget;
+          const pasted = e.clipboardData.getData('text');
+          const start = input.selectionStart ?? display.length;
+          const end = input.selectionEnd ?? display.length;
+          apply(display.slice(0, start) + pasted + display.slice(end));
+        }}
+        onBlur={(e) => format && apply(e.target.value)}
         required={required}
+        placeholder={placeholder}
         className="w-full px-3 py-2 rounded-lg bg-slate-800 border border-slate-700 text-white text-sm"
       />
     </div>
