@@ -5,9 +5,11 @@ import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { api } from '@/lib/api';
+import { getStoredUser, guestListPath } from '@/lib/auth';
 
 export default function RegisterGuestPage() {
   const router = useRouter();
+  const listPath = guestListPath(getStoredUser()?.role);
   const [loading, setLoading] = useState(false);
   const [form, setForm] = useState({
     hotelId: '',
@@ -39,7 +41,7 @@ export default function RegisterGuestPage() {
         ...form,
         age: form.age ? parseInt(form.age) : undefined,
       });
-      router.push('/guests');
+      router.push(listPath);
     } catch (err) {
       alert((err as Error).message);
     } finally {

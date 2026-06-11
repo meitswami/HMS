@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'HMS e-Register | Police Intelligence Command Centre',
+  title: 'HMS e-Register | Digital Hotel Visitor Register',
   description: 'AI-powered Hotel Visitor Intelligence Management System',
 };
 

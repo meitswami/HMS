@@ -10,9 +10,9 @@ import { clearSession } from '@/lib/auth';
 
 const navItems = [
   { href: '/hotel/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-  { href: '/guests', label: 'Guest Register', icon: Users },
-  { href: '/guests/register', label: 'Check-in Guest', icon: Users },
-  { href: '/ocr', label: 'OCR Scan', icon: ScanLine },
+  { href: '/hotel/guests', label: 'Guest Register', icon: Users },
+  { href: '/hotel/guests/register', label: 'Check-in Guest', icon: Users },
+  { href: '/hotel/ocr', label: 'OCR Scan', icon: ScanLine },
   { href: '/hotel/profile', label: 'My Hotel', icon: Building2 },
   { href: '/hotel/settings', label: 'Settings', icon: Settings },
 ];

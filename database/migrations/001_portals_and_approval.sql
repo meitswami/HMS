@@ -1,11 +1,11 @@
 -- Portal separation: hotel registration approval + police data access requests
 
 ALTER TABLE hotels
-  ADD COLUMN IF NOT EXISTS registration_status ENUM('pending','approved','rejected') NOT NULL DEFAULT 'approved' AFTER is_active,
-  ADD COLUMN IF NOT EXISTS approved_by CHAR(36) NULL AFTER registration_status,
-  ADD COLUMN IF NOT EXISTS approved_at TIMESTAMP NULL AFTER approved_by,
-  ADD COLUMN IF NOT EXISTS rejection_reason TEXT NULL AFTER approved_at,
-  ADD COLUMN IF NOT EXISTS registered_by_user_id CHAR(36) NULL AFTER rejection_reason;
+  ADD COLUMN registration_status ENUM('pending','approved','rejected') NOT NULL DEFAULT 'approved' AFTER is_active,
+  ADD COLUMN approved_by CHAR(36) NULL AFTER registration_status,
+  ADD COLUMN approved_at TIMESTAMP NULL AFTER approved_by,
+  ADD COLUMN rejection_reason TEXT NULL AFTER approved_at,
+  ADD COLUMN registered_by_user_id CHAR(36) NULL AFTER rejection_reason;
 
 CREATE TABLE IF NOT EXISTS data_access_requests (
     id              CHAR(36)     NOT NULL DEFAULT (UUID()),

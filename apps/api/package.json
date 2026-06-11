@@ -5,6 +5,7 @@
   "scripts": {
     "prebuild": "node -e \"const fs=require('fs');['dist','tsconfig.tsbuildinfo'].forEach(p=>{try{fs.rmSync(p,{recursive:true,force:true})}catch(e){}})\"",
     "build": "tsc -p tsconfig.json",
+    "prestart:dev": "npm run prebuild && npm run build",
     "start": "nest start",
     "start:dev": "nest start --watch",
     "start:prod": "node dist/main",

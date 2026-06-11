@@ -87,7 +87,7 @@ export class DataRequestsService {
     const guests = await this.guestRepo.find({
       where: {
         hotelId: In(request.hotelIds),
-        checkInDate: Between(request.dateFrom, request.dateTo),
+        checkInDate: Between(new Date(request.dateFrom), new Date(request.dateTo)),
       },
       order: { checkInDate: 'DESC', checkInTime: 'DESC' },
     });

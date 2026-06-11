@@ -163,7 +163,10 @@ class ApiClient {
   }
 
   importWatchlist(data: { apiUrl: string; apiKey?: string; defaultSource?: string }) {
-    return this.request('/watchlist/import', { method: 'POST', body: JSON.stringify(data) });
+    return this.request<{ imported: number; records: Array<Record<string, unknown>> }>(
+      '/watchlist/import',
+      { method: 'POST', body: JSON.stringify(data) },
+    );
   }
 
   // AI Search

@@ -73,3 +73,11 @@ export function redirectAfterLogin(role: string, intendedPortal?: PortalType): s
   }
   return getHomeForRole(role);
 }
+
+export function guestListPath(role?: string) {
+  return isHotelRole(role || '') ? '/hotel/guests' : '/guests';
+}
+
+export function guestRegisterPath(role?: string) {
+  return isHotelRole(role || '') ? '/hotel/guests/register' : '/guests/register';
+}

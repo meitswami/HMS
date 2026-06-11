@@ -7,8 +7,10 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { api } from '@/lib/api';
 import { getRiskColor } from '@/lib/utils';
 import Link from 'next/link';
+import { getStoredUser, guestRegisterPath } from '@/lib/auth';
 
 export default function GuestsPage() {
+  const registerPath = guestRegisterPath(getStoredUser()?.role);
   const [guests, setGuests] = useState<Array<Record<string, unknown>>>([]);
   const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(true);
@@ -32,7 +34,7 @@ export default function GuestsPage() {
           <h1 className="text-3xl font-bold text-white">Digital Register</h1>
           <p className="text-slate-400 mt-1">Guest check-in records</p>
         </div>
-        <Link href="/guests/register">
+        <Link href={registerPath}>
           <Button><Plus className="w-4 h-4 mr-2" /> New Check-in</Button>
         </Link>
       </div>

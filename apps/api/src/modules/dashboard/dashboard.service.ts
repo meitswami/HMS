@@ -73,10 +73,12 @@ export class DashboardService {
     `);
   }
 
-  async getRecentIncidents(limit = 10) {
+  async getRecentIncidents(limit?: number | string) {
+    const parsed = Number(limit);
+    const take = Number.isFinite(parsed) && parsed > 0 ? parsed : 10;
     return this.incidentRepo.find({
       order: { createdAt: 'DESC' },
-      take: limit,
+      take,
     });
   }
 }

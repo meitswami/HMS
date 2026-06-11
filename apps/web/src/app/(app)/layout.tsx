@@ -5,6 +5,7 @@ import { HotelSidebar } from '@/components/layout/hotel-sidebar';
 import { AdminSidebar } from '@/components/layout/admin-sidebar';
 import { AlertBanner } from '@/components/layout/alert-banner';
 import { getStoredUser, isHotelRole, isAdminRole } from '@/lib/auth';
+import { AuthGuard } from '@/components/auth/auth-guard';
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const user = getStoredUser();
@@ -25,10 +26,12 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <div className={`min-h-screen ${bgClass}`}>
-      {showAlert && <AlertBanner />}
-      <SidebarComponent />
-      <main className="ml-64 min-h-screen">{children}</main>
-    </div>
+    <AuthGuard>
+      <div className={`min-h-screen ${bgClass}`}>
+        {showAlert && <AlertBanner />}
+        <SidebarComponent />
+        <main className="ml-64 min-h-screen">{children}</main>
+      </div>
+    </AuthGuard>
   );
 }
