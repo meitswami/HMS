@@ -17,6 +17,7 @@ import { StorageModule } from './modules/storage/storage.module';
 import { WebsocketModule } from './modules/websocket/websocket.module';
 import { AiModule } from './modules/ai/ai.module';
 import { DashboardModule } from './modules/dashboard/dashboard.module';
+import { DataRequestsModule } from './modules/data-requests/data-requests.module';
 import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
 import { RolesGuard } from './common/guards/roles.guard';
 
@@ -66,6 +67,7 @@ import { RolesGuard } from './common/guards/roles.guard';
     WebsocketModule,
     AiModule,
     DashboardModule,
+    DataRequestsModule,
   ],
   providers: [
     { provide: APP_GUARD, useClass: ThrottlerGuard },

@@ -54,4 +54,60 @@ export class CreateWatchlistDto {
   @IsOptional()
   @IsString()
   description?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  email?: string;
+
+  @ApiPropertyOptional({ enum: ['male', 'female', 'other', 'unknown'] })
+  @IsOptional()
+  @IsEnum(['male', 'female', 'other', 'unknown'])
+  gender?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  nationality?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  policeStation?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  drivingLicense?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  voterId?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  panNumber?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  sourceRef?: string;
+}
+
+export class ImportWatchlistDto {
+  @ApiProperty({ description: 'URL of third-party API endpoint' })
+  @IsString()
+  apiUrl: string;
+
+  @ApiPropertyOptional({ description: 'Bearer token or API key for the external service' })
+  @IsOptional()
+  @IsString()
+  apiKey?: string;
+
+  @ApiPropertyOptional({ enum: ['police', 'absconder', 'wanted', 'missing', 'terror', 'fraud', 'state', 'custom'] })
+  @IsOptional()
+  @IsEnum(['police', 'absconder', 'wanted', 'missing', 'terror', 'fraud', 'state', 'custom'])
+  defaultSource?: string;
 }

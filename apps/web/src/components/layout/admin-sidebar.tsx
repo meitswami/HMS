@@ -3,36 +3,33 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
-  LayoutDashboard, Users, ScanLine, Shield,
-  AlertTriangle, BarChart3, Search, FileText, FileSearch, Settings, LogOut,
+  LayoutDashboard, Building2, ClipboardCheck, FileSearch, Users, Settings, LogOut, Shield,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { clearSession } from '@/lib/auth';
 
 const navItems = [
-  { href: '/dashboard', label: 'Command Centre', icon: LayoutDashboard },
-  { href: '/data-requests', label: 'Data Requests', icon: FileSearch },
-  { href: '/watchlist', label: 'Watchlist', icon: Shield },
-  { href: '/incidents', label: 'Incidents', icon: AlertTriangle },
-  { href: '/analytics', label: 'Analytics', icon: BarChart3 },
-  { href: '/ai-search', label: 'AI Search', icon: Search },
-  { href: '/reports', label: 'Reports', icon: FileText },
-  { href: '/settings', label: 'Settings', icon: Settings },
+  { href: '/admin/dashboard', label: 'Overview', icon: LayoutDashboard },
+  { href: '/admin/hotels', label: 'All Hotels', icon: Building2 },
+  { href: '/admin/hotels/pending', label: 'Pending Approvals', icon: ClipboardCheck },
+  { href: '/admin/data-requests', label: 'Data Requests', icon: FileSearch },
+  { href: '/admin/users', label: 'Users & RBAC', icon: Users },
+  { href: '/admin/settings', label: 'Settings', icon: Settings },
 ];
 
-export function Sidebar() {
+export function AdminSidebar() {
   const pathname = usePathname();
 
   return (
-    <aside className="w-64 bg-slate-950 border-r border-slate-800 flex flex-col h-screen fixed left-0 top-0">
-      <div className="p-6 border-b border-slate-800">
+    <aside className="w-64 bg-slate-950 border-r border-violet-900/30 flex flex-col h-screen fixed left-0 top-0">
+      <div className="p-6 border-b border-violet-900/30">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-lg bg-blue-600 flex items-center justify-center">
+          <div className="w-10 h-10 rounded-lg bg-violet-600 flex items-center justify-center">
             <Shield className="w-6 h-6 text-white" />
           </div>
           <div>
-            <h1 className="text-sm font-bold text-white leading-tight">HMS e-Register</h1>
-            <p className="text-xs text-slate-400">Police Command Centre</p>
+            <h1 className="text-sm font-bold text-white leading-tight">HMS Admin</h1>
+            <p className="text-xs text-violet-400">Management Panel</p>
           </div>
         </div>
       </div>
@@ -47,7 +44,7 @@ export function Sidebar() {
               className={cn(
                 'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors',
                 active
-                  ? 'bg-blue-600/20 text-blue-400 border border-blue-600/30'
+                  ? 'bg-violet-600/20 text-violet-300 border border-violet-600/30'
                   : 'text-slate-400 hover:text-white hover:bg-slate-800',
               )}
             >
@@ -58,12 +55,9 @@ export function Sidebar() {
         })}
       </nav>
 
-      <div className="p-4 border-t border-slate-800">
+      <div className="p-4 border-t border-violet-900/30">
         <button
-          onClick={() => {
-            clearSession();
-            window.location.href = '/login/police';
-          }}
+          onClick={() => { clearSession(); window.location.href = '/'; }}
           className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-slate-400 hover:text-red-400 hover:bg-slate-800 w-full transition-colors"
         >
           <LogOut className="w-5 h-5" />

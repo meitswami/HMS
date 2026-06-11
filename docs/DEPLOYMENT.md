@@ -60,13 +60,25 @@ This starts MinIO + Redis, then API + Web.
 
 ### OCR on Windows (separate terminal)
 
+**Option 1 — Lite (Tesseract only, fast install, ~500MB RAM):**
+
 ```powershell
 cd services\ocr-service
-python -m venv .venv
-.\.venv\Scripts\activate
+pip install -r requirements-lite.txt
+# Install Tesseract: https://github.com/UB-Mannheim/tesseract/wiki
+uvicorn main:app --reload --port 5000
+```
+
+Set in `.env`: `OCR_DEFAULT_ENGINE=tesseract`
+
+**Option 2 — Full (PaddleOCR + EasyOCR, needs ~2GB+ RAM):**
+
+```powershell
 pip install -r requirements.txt
 uvicorn main:app --reload --port 5000
 ```
+
+> **Note:** `paddleocr` requires `numpy<2.0`. Do not upgrade numpy to 2.x.
 
 | URL | Address |
 |-----|---------|

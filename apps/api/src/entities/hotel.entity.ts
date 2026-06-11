@@ -59,6 +59,26 @@ export class Hotel {
   @Column({ name: 'is_active', default: true })
   isActive: boolean;
 
+  @Column({
+    name: 'registration_status',
+    type: 'enum',
+    enum: ['pending', 'approved', 'rejected'],
+    default: 'approved',
+  })
+  registrationStatus: string;
+
+  @Column({ name: 'approved_by', nullable: true })
+  approvedBy: string;
+
+  @Column({ name: 'approved_at', nullable: true })
+  approvedAt: Date;
+
+  @Column({ name: 'rejection_reason', type: 'text', nullable: true })
+  rejectionReason: string;
+
+  @Column({ name: 'registered_by_user_id', nullable: true })
+  registeredByUserId: string;
+
   @Column({ name: 'is_online', default: false })
   isOnline: boolean;
 

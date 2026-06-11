@@ -9,6 +9,53 @@ export enum UserRole {
   RECEPTIONIST = 'receptionist',
 }
 
+export enum HotelRegistrationStatus {
+  PENDING = 'pending',
+  APPROVED = 'approved',
+  REJECTED = 'rejected',
+}
+
+export enum DataRequestStatus {
+  PENDING = 'pending',
+  APPROVED = 'approved',
+  REJECTED = 'rejected',
+  EXPIRED = 'expired',
+}
+
+export enum PortalType {
+  SUPER_ADMIN = 'superadmin',
+  ADMIN = 'admin',
+  HOTEL = 'hotel',
+  POLICE = 'police',
+}
+
+export const PORTAL_LOGIN_PATHS: Record<PortalType, string> = {
+  [PortalType.SUPER_ADMIN]: '/login/superadmin',
+  [PortalType.ADMIN]: '/login/admin',
+  [PortalType.HOTEL]: '/login/hotel',
+  [PortalType.POLICE]: '/login/police',
+};
+
+export const ROLE_PORTAL_MAP: Record<string, PortalType> = {
+  super_admin: PortalType.SUPER_ADMIN,
+  police_command: PortalType.ADMIN,
+  police_officer: PortalType.POLICE,
+  hotel_owner: PortalType.HOTEL,
+  hotel_manager: PortalType.HOTEL,
+  receptionist: PortalType.HOTEL,
+};
+
+export const PORTAL_HOME_PATHS: Record<PortalType, string> = {
+  [PortalType.SUPER_ADMIN]: '/admin/dashboard',
+  [PortalType.ADMIN]: '/admin/dashboard',
+  [PortalType.HOTEL]: '/hotel/dashboard',
+  [PortalType.POLICE]: '/dashboard',
+};
+
+export const HOTEL_ROLES = ['hotel_owner', 'hotel_manager', 'receptionist'] as const;
+export const POLICE_ROLES = ['police_command', 'police_officer'] as const;
+export const ADMIN_ROLES = ['super_admin', 'police_command'] as const;
+
 export enum AlertSeverity {
   CRITICAL = 'critical',
   HIGH = 'high',

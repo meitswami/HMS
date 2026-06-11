@@ -37,6 +37,11 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials');
     }
 
+    const roleSlug = user.role?.slug;
+    if (['hotel_owner', 'hotel_manager', 'receptionist'].includes(roleSlug) && !user.isVerified) {
+      throw new UnauthorizedException('Your hotel registration is pending approval. Please wait for administrator confirmation.');
+    }
+
     if (user.lockedUntil && user.lockedUntil > new Date()) {
       throw new UnauthorizedException('Account temporarily locked. Try again later.');
     }

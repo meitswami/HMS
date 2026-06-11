@@ -1,15 +1,13 @@
-# Full OCR stack (PaddleOCR + Tesseract + EasyOCR)
-# numpy must stay <2.0 — required by paddleocr
+# Lightweight OCR (Tesseract only) — Windows 11 / low-RAM EC2
+# Install: pip install -r requirements-lite.txt
+# Set OCR_DEFAULT_ENGINE=tesseract in .env
 fastapi==0.115.6
 uvicorn[standard]==0.34.0
 python-multipart==0.0.20
 numpy>=1.26.4,<2.0
 opencv-python-headless==4.10.0.84
 Pillow>=10.0.0,<12.0
-paddlepaddle==3.0.0
-paddleocr==2.9.1
 pytesseract==0.3.13
-easyocr==1.7.2
 minio==7.2.12
 redis==5.2.1
 pydantic>=2.10.0,<3.0
