@@ -60,7 +60,7 @@ export default function AdminDataRequestsPage() {
             </CardHeader>
             <CardContent>
               <p className="text-sm text-slate-400 mb-3">{r.reason as string}</p>
-              {(r.timeFrom || r.timeTo) && (
+              {Boolean(r.timeFrom || r.timeTo) && (
                 <p className="text-xs text-slate-500 mb-3">Time: {r.timeFrom as string} – {r.timeTo as string}</p>
               )}
               {r.status === 'pending' && (
