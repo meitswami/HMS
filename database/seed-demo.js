@@ -5,8 +5,17 @@
  */
 const fs = require('fs');
 const path = require('path');
+const crypto = require('crypto');
 const mysql = require('mysql2/promise');
 const bcrypt = require('bcrypt');
+
+function hashValue(value) {
+  return crypto.createHash('sha256').update(value.trim().toLowerCase()).digest('hex');
+}
+
+function normalizeAadhaar(value) {
+  return value.replace(/\D/g, '').slice(0, 12);
+}
 
 const DEMO_PASSWORD = 'Admin@123';
 
@@ -37,6 +46,10 @@ const IDS = {
     guest1: '00000000-0000-0000-0000-000000000601',
     guest2: '00000000-0000-0000-0000-000000000602',
     guest3: '00000000-0000-0000-0000-000000000603',
+  },
+  watchlist: {
+    entry1: '00000000-0000-0000-0000-000000000701',
+    entry2: '00000000-0000-0000-0000-000000000702',
   },
 };
 
@@ -169,6 +182,62 @@ async function seed() {
     );
   }
   console.log('  guests: 3 sample check-ins');
+
+  const demoWatchlist = [
+    {
+      id: IDS.watchlist.entry1,
+      source: 'wanted',
+      fullName: 'Demo Suspect Ali',
+      fatherName: 'Mohammed Ali',
+      mobile: '9876500001',
+      aadhaar: '123456789012',
+      crimeType: 'Theft',
+      firNumber: 'FIR/UDA/2024/101',
+      policeStation: 'Udaipur City PS',
+      severity: 'high',
+      description: 'Demo watchlist entry for live testing',
+    },
+    {
+      id: IDS.watchlist.entry2,
+      source: 'absconder',
+      fullName: 'Ravi Kumar Demo',
+      fatherName: 'Suresh Kumar',
+      mobile: '9876500002',
+      aadhaar: '998877665544',
+      crimeType: 'Fraud',
+      firNumber: 'FIR/JAI/2024/55',
+      policeStation: 'Jaipur East PS',
+      severity: 'medium',
+      description: 'Second demo watchlist entry',
+    },
+  ];
+
+  for (const w of demoWatchlist) {
+    await conn.query(
+      `INSERT INTO watchlists (id, tenant_id, source, full_name, father_name, mobile_number, aadhaar_hash, crime_type, fir_number, police_station, severity, description, is_active, created_by)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, ?)
+       ON DUPLICATE KEY UPDATE
+         full_name = VALUES(full_name),
+         aadhaar_hash = VALUES(aadhaar_hash),
+         is_active = 1`,
+      [
+        w.id,
+        IDS.tenant,
+        w.source,
+        w.fullName,
+        w.fatherName,
+        w.mobile,
+        hashValue(normalizeAadhaar(w.aadhaar)),
+        w.crimeType,
+        w.firNumber,
+        w.policeStation,
+        w.severity,
+        w.description,
+        IDS.users.police_command,
+      ],
+    );
+  }
+  console.log('  watchlist: 2 demo entries (Aadhaar test: 123456789012)');
 
   await conn.end();
 
