@@ -17,8 +17,12 @@ async function bootstrap() {
 
   // Security middleware
   app.use(helmet());
+  const corsOrigins = (configService.get<string>('CORS_ORIGINS') || configService.get<string>('APP_URL', 'http://localhost:3000'))
+    .split(',')
+    .map((o) => o.trim())
+    .filter(Boolean);
   app.enableCors({
-    origin: configService.get<string>('APP_URL', 'http://localhost:3000'),
+    origin: corsOrigins.length === 1 ? corsOrigins[0] : corsOrigins,
     credentials: true,
   });
 
