@@ -20,6 +20,7 @@
     "start:web": "npm run start --workspace=@hms/web",
     "start:ec2": "bash scripts/start-ec2-native.sh",
     "db:migrate": "node database/migrate.js",
+    "db:seed-demo": "node database/seed-demo.js",
     "infra:docker": "docker compose -f docker-compose.infra.yml up -d",
     "infra:docker:down": "docker compose -f docker-compose.infra.yml down",
     "docker:up": "docker compose up -d --build",
