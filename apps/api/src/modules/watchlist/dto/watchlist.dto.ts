@@ -20,7 +20,7 @@ export class CreateWatchlistDto {
   @IsDateString()
   dateOfBirth?: string;
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({ description: 'Aadhar Number — 12 digits, formatted as XXXX-XXXX-XXXX' })
   @IsOptional()
   @IsString()
   aadhaarNumber?: string;

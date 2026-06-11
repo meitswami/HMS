@@ -35,7 +35,7 @@ export class WatchlistService {
       severity: dto.severity || 'medium',
       description: dto.description,
       sourceRef: dto.sourceRef,
-      aadhaarHash: dto.aadhaarNumber ? CryptoUtil.hash(dto.aadhaarNumber) : undefined,
+      aadhaarHash: dto.aadhaarNumber ? CryptoUtil.hash(CryptoUtil.normalizeAadhaar(dto.aadhaarNumber)) : undefined,
       passportHash: dto.passportNumber ? CryptoUtil.hash(dto.passportNumber) : undefined,
       createdBy: userId,
     });
@@ -81,7 +81,7 @@ export class WatchlistService {
         severity: (rec.severity as string) || 'medium',
         nationality: rec.nationality as string,
         gender: rec.gender as string,
-        aadhaarHash: rec.aadhaarNumber ? CryptoUtil.hash(rec.aadhaarNumber as string) : undefined,
+        aadhaarHash: rec.aadhaarNumber ? CryptoUtil.hash(CryptoUtil.normalizeAadhaar(rec.aadhaarNumber as string)) : undefined,
         passportHash: rec.passportNumber ? CryptoUtil.hash(rec.passportNumber as string) : undefined,
         createdBy: userId,
       });

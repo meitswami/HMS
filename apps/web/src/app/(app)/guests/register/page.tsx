@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { api } from '@/lib/api';
 import { getStoredUser, guestListPath } from '@/lib/auth';
+import { AadharNumberField } from '@/components/ui/aadhar-number-field';
 
 export default function RegisterGuestPage() {
   const router = useRouter();
@@ -83,7 +84,12 @@ export default function RegisterGuestPage() {
         <Card className="mb-6">
           <CardHeader><CardTitle>Identity Documents</CardTitle></CardHeader>
           <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Field label="Aadhaar Number" value={form.aadhaarNumber} onChange={(v) => update('aadhaarNumber', v)} />
+            <AadharNumberField
+              value={form.aadhaarNumber}
+              onChange={(v) => update('aadhaarNumber', v)}
+              labelClassName="block text-sm text-slate-400 mb-1.5"
+              inputClassName="w-full px-4 py-2.5 rounded-lg bg-slate-800 border border-slate-700 text-white focus:outline-none focus:border-blue-500"
+            />
             <Field label="Passport Number" value={form.passportNumber} onChange={(v) => update('passportNumber', v)} />
           </CardContent>
         </Card>

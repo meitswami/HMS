@@ -5,6 +5,7 @@ import { Plus, Shield, Download, UserPlus } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { api } from '@/lib/api';
+import { AadharNumberField } from '@/components/ui/aadhar-number-field';
 
 const SOURCE_TYPES = ['police', 'absconder', 'wanted', 'missing', 'terror', 'fraud', 'state', 'custom'] as const;
 
@@ -137,7 +138,7 @@ export default function WatchlistPage() {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <Field label="Mobile" value={form.mobileNumber} onChange={(v) => update('mobileNumber', v)} />
                   <Field label="Email" value={form.email} onChange={(v) => update('email', v)} type="email" />
-                  <Field label="Aadhaar" value={form.aadhaarNumber} onChange={(v) => update('aadhaarNumber', v)} />
+                  <AadharNumberField value={form.aadhaarNumber} onChange={(v) => update('aadhaarNumber', v)} />
                   <Field label="Passport" value={form.passportNumber} onChange={(v) => update('passportNumber', v)} />
                   <Field label="Driving License" value={form.drivingLicense} onChange={(v) => update('drivingLicense', v)} />
                   <Field label="Voter ID" value={form.voterId} onChange={(v) => update('voterId', v)} />

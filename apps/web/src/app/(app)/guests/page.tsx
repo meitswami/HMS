@@ -71,7 +71,7 @@ export default function GuestsPage() {
                     <th className="text-left py-3 px-4">Room</th>
                     <th className="text-left py-3 px-4">Check-in</th>
                     <th className="text-left py-3 px-4">Nationality</th>
-                    <th className="text-left py-3 px-4">Aadhaar</th>
+                    <th className="text-left py-3 px-4">Aadhar Verification</th>
                     <th className="text-left py-3 px-4">Risk</th>
                   </tr>
                 </thead>
