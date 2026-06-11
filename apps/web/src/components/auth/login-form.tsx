@@ -5,7 +5,7 @@ import { Eye, EyeOff } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { api } from '@/lib/api';
-import { saveSession, redirectAfterLogin, canAccessPortal, AuthUser } from '@/lib/auth';
+import { saveSession, redirectAfterLogin, canAccessPortal } from '@/lib/auth';
 import { PortalType } from '@hms/shared';
 
 interface LoginFormProps {
@@ -59,7 +59,7 @@ export function LoginForm({
         return;
       }
 
-      const user = result.user as AuthUser;
+      const user = result.user;
       if (!canAccessPortal(user.role, portal)) {
         setError('Your account does not have access to this portal. Please use the correct login page.');
         return;

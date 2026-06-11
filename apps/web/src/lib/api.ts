@@ -1,3 +1,5 @@
+import type { AuthUser } from './auth';
+
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
 const API_PREFIX = '/api/v1';
 
@@ -39,14 +41,14 @@ class ApiClient {
 
   // Auth
   login(email: string, password: string, mfaCode?: string) {
-    return this.request<{ accessToken: string; refreshToken: string; user: Record<string, unknown>; requiresMfa?: boolean }>(
+    return this.request<{ accessToken: string; refreshToken: string; user: AuthUser; requiresMfa?: boolean }>(
       '/auth/login',
       { method: 'POST', body: JSON.stringify({ email, password, mfaCode }) },
     );
   }
 
   getMe() {
-    return this.request<{ user: Record<string, unknown> }>('/auth/me');
+    return this.request<{ user: AuthUser }>('/auth/me');
   }
 
   // Dashboard
