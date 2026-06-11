@@ -18,7 +18,7 @@ export class DashboardController {
   }
 
   @Get('districts')
-  @Roles('super_admin', 'police_command')
+  @Roles('super_admin', 'police_command', 'police_officer')
   getDistrictStats() {
     return this.dashboardService.getDistrictStats();
   }
