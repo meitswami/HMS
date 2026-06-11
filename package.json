@@ -13,7 +13,7 @@
     "dev:api": "npm run start:dev --workspace=@hms/api",
     "dev:web": "npm run dev --workspace=@hms/web",
     "dev:ocr": "cd services/ocr-service && python -m uvicorn main:app --reload --port 5000",
-    "build": "npm run build --workspaces --if-present",
+    "build": "npm run build:shared && npm run build --workspaces --if-present",
     "build:api": "npm run build:shared && npm run build --workspace=@hms/api",
     "build:web": "npm run build --workspace=@hms/web",
     "start:api": "npm run start:prod --workspace=@hms/api",
