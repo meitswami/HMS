@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 import { Watchlist } from '../../entities/watchlist.entity';
 import { CryptoUtil } from '../../common/utils/crypto.util';
 import { CreateWatchlistDto, ImportWatchlistDto } from './dto/watchlist.dto';
+import { getPagination } from '../../common/utils/pagination.util';
 
 export interface MatchInput {
   aadhaarHash?: string;
@@ -94,17 +95,18 @@ export class WatchlistService {
     return { imported: imported.length, records: imported };
   }
 
-  async findAll(page = 1, limit = 20, source?: string) {
+  async findAll(page?: number, limit?: number, source?: string) {
+    const { page: safePage, limit: safeLimit, skip } = getPagination(page, limit);
     const where: Record<string, unknown> = { isActive: true };
     if (source) where.source = source;
 
     const [data, total] = await this.watchlistRepo.findAndCount({
       where,
       order: { createdAt: 'DESC' },
-      skip: (page - 1) * limit,
-      take: limit,
+      skip,
+      take: safeLimit,
     });
-    return { data, meta: { page, limit, total } };
+    return { data, meta: { page: safePage, limit: safeLimit, total } };
   }
 
   /** Multi-strategy matching: exact hash, mobile, fuzzy name */

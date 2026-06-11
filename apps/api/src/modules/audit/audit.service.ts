@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { AuditLog } from '../../entities/audit-log.entity';
+import { getPagination } from '../../common/utils/pagination.util';
 import { CryptoUtil } from '../../common/utils/crypto.util';
 
 export interface AuditLogInput {
@@ -55,13 +56,14 @@ export class AuditService {
     page?: number;
     limit?: number;
   }) {
-    const { page = 1, limit = 50, ...where } = filters;
+    const { page, limit, ...where } = filters;
+    const { page: safePage, limit: safeLimit, skip } = getPagination(page, limit, 50);
     const [data, total] = await this.auditRepo.findAndCount({
       where,
       order: { createdAt: 'DESC' },
-      skip: (page - 1) * limit,
-      take: limit,
+      skip,
+      take: safeLimit,
     });
-    return { data, meta: { page, limit, total } };
+    return { data, meta: { page: safePage, limit: safeLimit, total } };
   }
 }

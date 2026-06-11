@@ -5,6 +5,7 @@ import { DataAccessRequest } from '../../entities/data-access-request.entity';
 import { Guest } from '../../entities/guest.entity';
 import { CreateDataRequestDto } from './dto/data-request.dto';
 import { AuditService } from '../audit/audit.service';
+import { getPagination } from '../../common/utils/pagination.util';
 
 @Injectable()
 export class DataRequestsService {
@@ -28,27 +29,29 @@ export class DataRequestsService {
     return saved;
   }
 
-  async findAll(tenantId: string, status?: string, page = 1, limit = 20) {
+  async findAll(tenantId: string, status?: string, page?: number, limit?: number) {
+    const { page: safePage, limit: safeLimit, skip } = getPagination(page, limit);
     const where: Record<string, unknown> = { tenantId };
     if (status) where.status = status;
 
     const [data, total] = await this.requestRepo.findAndCount({
       where,
       order: { createdAt: 'DESC' },
-      skip: (page - 1) * limit,
-      take: limit,
+      skip,
+      take: safeLimit,
     });
-    return { data, meta: { page, limit, total } };
+    return { data, meta: { page: safePage, limit: safeLimit, total } };
   }
 
-  async findMyRequests(userId: string, page = 1, limit = 20) {
+  async findMyRequests(userId: string, page?: number, limit?: number) {
+    const { page: safePage, limit: safeLimit, skip } = getPagination(page, limit);
     const [data, total] = await this.requestRepo.findAndCount({
       where: { requestedBy: userId },
       order: { createdAt: 'DESC' },
-      skip: (page - 1) * limit,
-      take: limit,
+      skip,
+      take: safeLimit,
     });
-    return { data, meta: { page, limit, total } };
+    return { data, meta: { page: safePage, limit: safeLimit, total } };
   }
 
   async approve(id: string, userId: string, reviewNotes?: string) {

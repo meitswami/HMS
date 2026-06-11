@@ -6,6 +6,7 @@ import { OcrScan } from '../../entities/ocr-scan.entity';
 import { StorageService } from '../storage/storage.service';
 import { WebsocketGateway } from '../websocket/websocket.gateway';
 import { WS_EVENTS } from '@hms/shared';
+import { getPagination } from '../../common/utils/pagination.util';
 
 @Injectable()
 export class OcrService {
@@ -83,14 +84,15 @@ export class OcrService {
     }
   }
 
-  async findAll(hotelId: string, page = 1, limit = 20) {
+  async findAll(hotelId: string, page?: number, limit?: number) {
+    const { page: safePage, limit: safeLimit, skip } = getPagination(page, limit);
     const [data, total] = await this.ocrRepo.findAndCount({
       where: { hotelId },
       order: { createdAt: 'DESC' },
-      skip: (page - 1) * limit,
-      take: limit,
+      skip,
+      take: safeLimit,
     });
-    return { data, meta: { page, limit, total } };
+    return { data, meta: { page: safePage, limit: safeLimit, total } };
   }
 
   async approve(scanId: string, userId: string) {

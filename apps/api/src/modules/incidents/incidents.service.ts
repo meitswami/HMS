@@ -6,6 +6,7 @@ import { Guest } from '../../entities/guest.entity';
 import { Watchlist } from '../../entities/watchlist.entity';
 import { NotificationsService } from '../notifications/notifications.service';
 import { WebsocketGateway } from '../websocket/websocket.gateway';
+import { getPagination } from '../../common/utils/pagination.util';
 import { WS_EVENTS } from '@hms/shared';
 
 @Injectable()
@@ -52,7 +53,8 @@ export class IncidentsService {
   }
 
   async findAll(filters: { status?: string; severity?: string; page?: number; limit?: number }) {
-    const { page = 1, limit = 20, status, severity } = filters;
+    const { status, severity, page, limit } = filters;
+    const { page: safePage, limit: safeLimit, skip } = getPagination(page, limit);
     const where: Record<string, unknown> = {};
     if (status) where.status = status;
     if (severity) where.severity = severity;
@@ -60,10 +62,10 @@ export class IncidentsService {
     const [data, total] = await this.incidentRepo.findAndCount({
       where,
       order: { createdAt: 'DESC' },
-      skip: (page - 1) * limit,
-      take: limit,
+      skip,
+      take: safeLimit,
     });
-    return { data, meta: { page, limit, total } };
+    return { data, meta: { page: safePage, limit: safeLimit, total } };
   }
 
   async updateStatus(id: string, status: string, userId: string, notes?: string) {

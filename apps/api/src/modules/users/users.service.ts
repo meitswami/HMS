@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { User } from '../../entities/user.entity';
 import { CreateUserDto } from './dto/user.dto';
+import { getPagination } from '../../common/utils/pagination.util';
 
 @Injectable()
 export class UsersService {
@@ -20,15 +21,16 @@ export class UsersService {
     return this.userRepo.save(user);
   }
 
-  async findAll(tenantId: string, page = 1, limit = 20) {
+  async findAll(tenantId: string, page?: number, limit?: number) {
+    const { page: safePage, limit: safeLimit, skip } = getPagination(page, limit);
     const [data, total] = await this.userRepo.findAndCount({
       where: { tenantId },
       relations: ['role'],
       order: { createdAt: 'DESC' },
-      skip: (page - 1) * limit,
-      take: limit,
+      skip,
+      take: safeLimit,
     });
-    return { data, meta: { page, limit, total } };
+    return { data, meta: { page: safePage, limit: safeLimit, total } };
   }
 
   async findOne(id: string) {

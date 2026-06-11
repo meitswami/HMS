@@ -11,6 +11,7 @@ import { WebsocketGateway } from '../websocket/websocket.gateway';
 import { AuditService } from '../audit/audit.service';
 import { CreateGuestDto, CheckoutGuestDto, GuestQueryDto } from './dto/guest.dto';
 import { WS_EVENTS } from '@hms/shared';
+import { getPagination } from '../../common/utils/pagination.util';
 
 @Injectable()
 export class GuestsService {
@@ -119,7 +120,8 @@ export class GuestsService {
   }
 
   async findAll(query: GuestQueryDto, tenantId: string) {
-    const { page = 1, limit = 20, hotelId, status, search } = query;
+    const { hotelId, status, search } = query;
+    const { page, limit, skip } = getPagination(query.page, query.limit);
     const qb = this.guestRepo.createQueryBuilder('g')
       .leftJoinAndSelect('g.hotel', 'hotel')
       .leftJoinAndSelect('g.vehicles', 'vehicles')
@@ -133,7 +135,7 @@ export class GuestsService {
 
     const [data, total] = await qb
       .orderBy('g.createdAt', 'DESC')
-      .skip((page - 1) * limit)
+      .skip(skip)
       .take(limit)
       .getManyAndCount();
 

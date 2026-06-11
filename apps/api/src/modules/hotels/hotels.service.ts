@@ -10,6 +10,7 @@ import { User } from '../../entities/user.entity';
 import { Role } from '../../entities/role.entity';
 import { CreateHotelDto, UpdateHotelDto, RegisterHotelDto } from './dto/hotel.dto';
 import { AuditService } from '../audit/audit.service';
+import { getPagination } from '../../common/utils/pagination.util';
 
 @Injectable()
 export class HotelsService {
@@ -81,20 +82,22 @@ export class HotelsService {
     return saved;
   }
 
-  async findPending(tenantId?: string, page = 1, limit = 20) {
+  async findPending(tenantId?: string, page?: number, limit?: number) {
+    const { page: safePage, limit: safeLimit, skip } = getPagination(page, limit);
     const where: Record<string, unknown> = { registrationStatus: 'pending' };
     if (tenantId) where.tenantId = tenantId;
 
     const [data, total] = await this.hotelRepo.findAndCount({
       where,
       order: { createdAt: 'DESC' },
-      skip: (page - 1) * limit,
-      take: limit,
+      skip,
+      take: safeLimit,
     });
-    return { data, meta: { page, limit, total } };
+    return { data, meta: { page: safePage, limit: safeLimit, total } };
   }
 
-  async findAll(tenantId: string, page = 1, limit = 20, includeInactive = false) {
+  async findAll(tenantId: string, page?: number, limit?: number, includeInactive = false) {
+    const { page: safePage, limit: safeLimit, skip } = getPagination(page, limit);
     const where: Record<string, unknown> = { tenantId };
     if (!includeInactive) {
       where.isActive = true;
@@ -104,19 +107,20 @@ export class HotelsService {
     const [data, total] = await this.hotelRepo.findAndCount({
       where,
       order: { createdAt: 'DESC' },
-      skip: (page - 1) * limit,
-      take: limit,
+      skip,
+      take: safeLimit,
     });
-    return { data, meta: { page, limit, total } };
+    return { data, meta: { page: safePage, limit: safeLimit, total } };
   }
 
-  async findAllAdmin(page = 1, limit = 50) {
+  async findAllAdmin(page?: number, limit?: number) {
+    const { page: safePage, limit: safeLimit, skip } = getPagination(page, limit, 50);
     const [data, total] = await this.hotelRepo.findAndCount({
       order: { createdAt: 'DESC' },
-      skip: (page - 1) * limit,
-      take: limit,
+      skip,
+      take: safeLimit,
     });
-    return { data, meta: { page, limit, total } };
+    return { data, meta: { page: safePage, limit: safeLimit, total } };
   }
 
   async findOne(id: string) {
