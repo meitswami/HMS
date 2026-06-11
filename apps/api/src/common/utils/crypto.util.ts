@@ -30,6 +30,11 @@ export class CryptoUtil {
     return Buffer.concat([decipher.update(encrypted), decipher.final()]).toString('utf8');
   }
 
+  /** Strip formatting; Aadhar is always 12 digits without separators. */
+  static normalizeAadhaar(value: string): string {
+    return value.replace(/\D/g, '').slice(0, 12);
+  }
+
   /** SHA-256 hash for blacklist matching without storing plaintext */
   static hash(value: string): string {
     return crypto.createHash('sha256').update(value.trim().toLowerCase()).digest('hex');
@@ -42,7 +47,8 @@ export class CryptoUtil {
   }
 
   static maskAadhaar(aadhaar: string): string {
-    if (aadhaar.length < 4) return '****';
-    return `XXXX-XXXX-${aadhaar.slice(-4)}`;
+    const digits = this.normalizeAadhaar(aadhaar);
+    if (digits.length < 4) return '****';
+    return `XXXX-XXXX-${digits.slice(-4)}`;
   }
 }

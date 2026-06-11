@@ -50,6 +50,37 @@ function prepareSqlFixed(raw) {
   return sql;
 }
 
+async function runPortalMigrations(conn) {
+  const alterStatements = [
+    `ALTER TABLE hotels ADD COLUMN registration_status ENUM('pending','approved','rejected') NOT NULL DEFAULT 'approved' AFTER is_active`,
+    `ALTER TABLE hotels ADD COLUMN approved_by CHAR(36) NULL AFTER registration_status`,
+    `ALTER TABLE hotels ADD COLUMN approved_at TIMESTAMP NULL AFTER approved_by`,
+    `ALTER TABLE hotels ADD COLUMN rejection_reason TEXT NULL AFTER approved_at`,
+    `ALTER TABLE hotels ADD COLUMN registered_by_user_id CHAR(36) NULL AFTER rejection_reason`,
+  ];
+
+  for (const stmt of alterStatements) {
+    try {
+      await conn.query(stmt);
+      console.log('OK:', stmt.slice(0, 55) + '...');
+    } catch (e) {
+      if (e.code === 'ER_DUP_FIELDNAME') {
+        console.log('SKIP (exists):', stmt.slice(0, 45) + '...');
+      } else {
+        throw e;
+      }
+    }
+  }
+
+  const tableSql = fs.readFileSync(path.join(__dirname, 'migrations', '001_portals_and_approval.sql'), 'utf8');
+  const createPart = tableSql.split('CREATE TABLE IF NOT EXISTS data_access_requests')[1];
+  if (createPart) {
+    const createStmt = 'CREATE TABLE IF NOT EXISTS data_access_requests' + createPart.replace(/DEFAULT \(UUID\(\)\)/gi, '');
+    await conn.query(createStmt);
+    console.log('OK: data_access_requests table');
+  }
+}
+
 async function migrate() {
   loadEnv();
 
@@ -69,6 +100,8 @@ async function migrate() {
   const sql = prepareSqlFixed(fs.readFileSync(path.join(__dirname, 'schema.sql'), 'utf8'));
   console.log('Running schema.sql (safe to re-run)...');
   await conn.query(sql);
+  console.log('Running portal migrations (hotels approval + data_access_requests)...');
+  await runPortalMigrations(conn);
   await conn.end();
 
   console.log('Database schema applied successfully.');
